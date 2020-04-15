@@ -4,7 +4,7 @@ The template of the main script of the machine learning process
 import pickle
 import numpy as np
 import games.arkanoid.communication as comm
-from games.arkanoid.communication import ( \
+from games.arkanoid.communication import ( 
     SceneInfo, GameStatus, PlatformAction
 )
 import os.path as path
@@ -25,7 +25,7 @@ def ml_loop():
     # === Here is the execution order of the loop === #
     # 1. Put the initialization code here.
     ball_served = False
-    filename = path.join(path.dirname(__file__),"save\clf_KMeans_BallAndDirection.pickle")
+    filename = path.join(path.dirname(__file__),"save/clf_KMeans_BallAndDirection.pickle")
     with open(filename, 'rb') as file:
         clf = pickle.load(file)
 
