@@ -103,10 +103,6 @@ def ml_loop():
                 comm.send_instruction(scene_info.frame, PlatformAction.MOVE_RIGHT)
                 print('RIGHT')
 '''
-            """
-The template of the main script of the machine learning process
-"""
-
 import games.arkanoid.communication as comm
 from games.arkanoid.communication import ( \
     SceneInfo, GameStatus, PlatformAction
