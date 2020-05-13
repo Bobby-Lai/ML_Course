@@ -31,21 +31,21 @@ def ml_loop(side: str):
             else : return 2 # goes left
 
     def ml_loop_for_1P(): 
-        if scene_info["ball_speed"][1] < 0 :
-            if scene_info["ball_speed"][0] < 0:
-                direction = 0
-            else :
-                direction = 1
-        else :
-            if scene_info["ball_speed"][0] < 0:
-                direction = 2
-            else:
-                direction = 3
         ball_x = -1*scene_info["ball"][0]
         ball_y = -1*scene_info["ball"][1]
         block_x = -1*scene_info["blocker"][0]
         speed_x = -1*scene_info["ball_speed"][0]
         speed_y = -1*scene_info["ball_speed"][1]
+        if speed_y > 0 :
+            if speed_x > 0:
+                direction = 0
+            else :
+                direction = 1
+        else :
+            if speed_x > 0:
+                direction = 2
+            else:
+                direction = 3
         X = [ball_x, ball_y, direction, block_x, speed_x, speed_y]
         X = np.array(X).reshape((1,-1))
         pred = -1 * model.predict(X)
