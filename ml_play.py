@@ -38,7 +38,21 @@ def ml_loop(side: str):
             else : return 2 # goes left
 
     def ml_loop_for_1P(): 
-        if scene_info["ball_speed"][1] > 0 : # 球正在向下 # ball goes down
+        if scene_info["ball_speed"][1] < 0 :
+            if scene_info["ball_speed"][0] < 0:
+                direction = 0
+            else :
+                direction = 1
+        else :
+            if scene_info["ball_speed"][0] < 0:
+                direction = 2
+            else:
+                direction = 3
+        X = [scene_info["ball"][0], scene_info["ball"][1], direction, scene_info["blocker"][0],scene_info["ball_speed"][0],scene_info["ball_speed"][1]]
+        X = np.array(X).reshape((1,-1))
+        pred = model.predict(X)
+        return move_to(player = '1P',pred = pred)
+        '''if scene_info["ball_speed"][1] > 0 : # 球正在向下 # ball goes down
             x = ( scene_info["platform_1P"][1]-scene_info["ball"][1] ) // scene_info["ball_speed"][1] # 幾個frame以後會需要接  # x means how many frames before catch the ball
             pred = scene_info["ball"][0]+(scene_info["ball_speed"][0]*x)  # 預測最終位置 # pred means predict ball landing site 
             bound = pred // 200 # Determine if it is beyond the boundary
@@ -54,7 +68,7 @@ def ml_loop(side: str):
                     pred = pred + (abs(bound)*200)
             return move_to(player = '1P',pred = pred)
         else : # 球正在向上 # ball goes up
-            return move_to(player = '1P',pred = 100)
+            return move_to(player = '1P',pred = 100)'''
 
 
     def ml_loop_for_2P():  # as same as 1P
