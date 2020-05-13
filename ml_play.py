@@ -48,7 +48,7 @@ def ml_loop(side: str):
                 direction = 3
         X = [ball_x, ball_y, direction, block_x, speed_x, speed_y]
         X = np.array(X).reshape((1,-1))
-        pred = -1 * model.predict(X)
+        pred = 200 - model.predict(X)
         return move_to(player = '1P',pred = pred)
     
     def ml_loop_for_2P():  # as same as 1P
