@@ -14,7 +14,7 @@ def ml_loop(side: str):
     def move_to(player, pred) : #move platform to predicted position to catch ball 
         if player == '1P':
             if scene_info["platform_1P"][0]+20  > (pred-10) and scene_info["platform_1P"][0]+20 < (pred+10):
-                if scene_info["platform_2P"][1]+30-scene_info["ball_speed"][1] > scene_info["ball"][1] : #slice
+                if scene_info["platform_1P"][1]+30-scene_info["ball_speed"][1] > scene_info["ball"][1] : #slice
                     return 0
                     #if scene_info["ball"][0] > scene_info["platform_2P"][0]+20 and scene_info["ball_speed"][0] > 0:
                     #    return 1
