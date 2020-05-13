@@ -15,11 +15,11 @@ def ml_loop(side: str):
         if player == '1P':
             if scene_info["platform_1P"][0]+20  > (pred-10) and scene_info["platform_1P"][0]+20 < (pred+10):
                 if scene_info["ball"][0] > scene_info["platform_1P"][0]+20 and scene_info["ball_speed"][0] > 0:
-                        return 1
-                    elif scene_info["ball"][0] > scene_info["platform_1P"][0]+20 and scene_info["ball_speed"][0] < 0:
-                        return 1
-            else :
-                return 0 # NONE
+                    return 1
+                elif scene_info["ball"][0] > scene_info["platform_1P"][0]+20 and scene_info["ball_speed"][0] < 0:
+                    return 1
+                else :
+                    return 0 # NONE
             elif scene_info["platform_1P"][0]+20 <= (pred-10) : return 1 # goes right
             else : return 2 # goes left
         else :
