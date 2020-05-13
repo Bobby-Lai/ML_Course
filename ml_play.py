@@ -41,9 +41,14 @@ def ml_loop(side: str):
                 direction = 2
             else:
                 direction = 3
-        X = [-scene_info["ball"][0], -scene_info["ball"][1], direction, -scene_info["blocker"][0],-scene_info["ball_speed"][0],-scene_info["ball_speed"][1]]
+        ball_x = -1*scene_info["ball"][0]
+        ball_y = -1*scene_info["ball"][1]
+        block_x = -1*scene_info["blocker"][0]
+        speed_x = -1*scene_info["ball_speed"][0]
+        speed_y = -1*scene_info["ball_speed"][1]
+        X = [ball_x, ball_y, direction, block_x, speed_x, speed_y]
         X = np.array(X).reshape((1,-1))
-        pred = -model.predict(X)
+        pred = -1 * model.predict(X)
         return move_to(player = '1P',pred = pred)
         '''if scene_info["ball_speed"][1] > 0 : # 球正在向下 # ball goes down
             x = ( scene_info["platform_1P"][1]-scene_info["ball"][1] ) // scene_info["ball_speed"][1] # 幾個frame以後會需要接  # x means how many frames before catch the ball
