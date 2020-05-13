@@ -9,7 +9,7 @@ import numpy as np
 import os.path as path
 
 def ml_loop(side: str):
-     """
+    """
     The main loop for the machine learning process
 
     The `side` parameter can be used for switch the code for either of both sides,
@@ -27,8 +27,8 @@ def ml_loop(side: str):
     # === Here is the execution order of the loop === #
 
     # 1. Put the initialization code here
-    ball_served = False
-    
+	ball_served = False
+	 
     filename = path.path.join(path.dirname(__file__),'save','mymodel.pickle')
     with open(filename, 'rb') as file:
         model = pickle.load(file)
