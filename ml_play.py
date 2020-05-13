@@ -17,7 +17,7 @@ def ml_loop(side: str):
                 if scene_info["ball"][0] > scene_info["platform_1P"][0]+20 and scene_info["ball_speed"][0] > 0:
                         return 1
                     elif scene_info["ball"][0] > scene_info["platform_1P"][0]+20 and scene_info["ball_speed"][0] < 0:
-                        return 2
+                        return 1
             else :
                 return 0 # NONE
             elif scene_info["platform_1P"][0]+20 <= (pred-10) : return 1 # goes right
