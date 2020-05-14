@@ -79,7 +79,9 @@ def ml_loop(side: str):
 			if scene_info["platform_1P"][0]+20  > (pred-10) and scene_info["platform_1P"][0]+20 < (pred+10):
 				# Slicing
 				if scene_info["platform_1P"][1] <= scene_info["ball"][1] + scene_info["ball_speed"][1]:
-					return slicing_predict(ball_x = scene_info["ball"][0], speed_x = scene_info["ball_speed"][0], speed_y = scene_info["ball_speed"][1])
+					slicing_dir = slicing_predict(ball_x = scene_info["ball"][0], speed_x = scene_info["ball_speed"][0], speed_y = scene_info["ball_speed"][1])
+					print("******Slicing", slicing_dir)
+					return slicing_dir
 					'''if scene_info["ball_speed"][0] < 0:
 						print("RIGHT, speed_x = ", scene_info["ball_speed"][0], "speed_y = ", scene_info["ball_speed"][1], "ball_y = ", scene_info["ball"][1])
 						return 1
@@ -87,15 +89,15 @@ def ml_loop(side: str):
 						print("LEFT, speed_x = ", scene_info["ball_speed"][0], "speed_y = ", scene_info["ball_speed"][1], "ball_y = ", scene_info["ball"][1])
 						return 2'''
 				else:
-					afterR = scene_info["platform_1P"][0] + 5
+					'''afterR = scene_info["platform_1P"][0] + 5
 					afterL = scene_info["platform_1P"][0] - 5
 					if scene_info["platform_1P"][0] < 100 and afterR+30 > pred and afterR+10 < pred:
 						return 1
 					elif scene_info["platform_1P"][0] > 100 and afterL+30 > pred and afterL+10 < pred:
 						return 2
 					#print("N")
-					else:
-						return 0    #NONE
+					else:'''
+					return 0    #NONE
 			elif scene_info["platform_1P"][0]+20 <= (pred-10):
 				#print("R")
 				return 1	#RIGHT
@@ -142,8 +144,11 @@ def ml_loop(side: str):
 				x = 0
 				speed *= -1
 		if blocker_x > x+5 or blocker_x+30 < x:
-			return speed_x / abs(speed_x)
-			print("Slice Positive, ", speed_x/abs(speed_x), " / ", speed_x)
+			if speed_x > 0:
+				return 1
+			elif speed_x <0:
+				return 2
+			#print("Slice Positive, ", speed_x/abs(speed_x), " / ", speed_x)
 
 		# Opposite Slicing
 		x = ball_x
@@ -170,8 +175,11 @@ def ml_loop(side: str):
 				x = 0
 				speed *= -1
 		if blocker_x > x+5 or blocker_x+30 < x:
-			return -(speed_x / abs(speed_x))
-			print("Slice Oppositive, ", -(speed_x / abs(speed_x)), " / ", speed_x)
+			if speed_x > 0:
+				return 2
+			elif speed_x < 0:
+				return 1
+			#print("Slice Oppositive, ", -(speed_x / abs(speed_x)), " / ", speed_x)
 		return 0
 		print("No Slice")
 
