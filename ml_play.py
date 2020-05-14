@@ -137,7 +137,7 @@ def ml_loop(side: str):
 			elif x < 0:
 				x = 0
 				speed *= -1
-		if blocker_x > x+5 or blocker_x+30 < x:
+		if blocker_x > x+15 or blocker_x+40 < x:
 			if speed_x > 0:
 				return 1
 			elif speed_x <0:
@@ -168,7 +168,7 @@ def ml_loop(side: str):
 			elif x < 0:
 				x = 0
 				speed *= -1
-		if blocker_x > x+5 or blocker_x+30 < x:
+		if blocker_x > x+15 or blocker_x+40 < x:
 			if speed_x > 0:
 				return 2
 			elif speed_x < 0:
