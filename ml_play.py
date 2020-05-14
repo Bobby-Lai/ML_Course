@@ -122,8 +122,8 @@ def ml_loop(side: str):
 
 		while y > 240:
 			blocker_x = blocker_x + (blocker_direction * 5)
-			if blocker_x>270:
-				blocker_x = 270
+			if blocker_x>170:
+				blocker_x = 170
 				blocker_direction *= -1
 			elif blocker_x < 0:
 				blocker_x = 0
@@ -153,8 +153,8 @@ def ml_loop(side: str):
 
 		while y > 240:
 			blocker_x = blocker_x + (blocker_direction * 5)
-			if blocker_x>270:
-				blocker_x = 270
+			if blocker_x>170:
+				blocker_x = 170
 				blocker_direction *= -1
 			elif blocker_x < 0:
 				blocker_x = 0
