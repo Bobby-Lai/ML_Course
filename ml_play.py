@@ -28,6 +28,8 @@ def ml_loop(side: str):
 
 	# 1. Put the initialization code here
 	ball_served = False
+	blocker_dir = 0	# Blocker's moving direction (0: None, 1: Right, 2: Left)
+	pre_blocker = 0
 
 	filename = path.join(path.dirname(__file__),'save','mymodel.pickle')
 	with open(filename, 'rb') as file:
@@ -75,16 +77,30 @@ def ml_loop(side: str):
 	def move_to(plat_side, pred):
 		if plat_side == '1P':
 			if scene_info["platform_1P"][0]+20  > (pred-10) and scene_info["platform_1P"][0]+20 < (pred+10):
-				if scene_info["platform_1P"][1]-scene_info["ball_speed"][1] < scene_info["ball"][1]:
-					if scene_info["ball"][0] > scene_info["platform_1P"][0]+20:
+				# Slicing
+				if scene_info["platform_1P"][1] <= scene_info["ball"][1] + scene_info["ball_speed"][1]:
+					return slicing_predict(ball_x = scene_info["ball"][0], speed_x = scene_info["ball_speed"][0], speed_y = scene_info["ball_speed"][1])
+					'''if scene_info["ball_speed"][0] < 0:
+						print("RIGHT, speed_x = ", scene_info["ball_speed"][0], "speed_y = ", scene_info["ball_speed"][1], "ball_y = ", scene_info["ball"][1])
 						return 1
-					elif scene_info["ball"][0] < scene_info["platform_1P"][0]+20:
-						return 2
+					elif scene_info["ball_speed"][0] > 0:
+						print("LEFT, speed_x = ", scene_info["ball_speed"][0], "speed_y = ", scene_info["ball_speed"][1], "ball_y = ", scene_info["ball"][1])
+						return 2'''
 				else:
-					return 0    #NONE
+					afterR = scene_info["platform_1P"][0] + 5
+					afterL = scene_info["platform_1P"][0] - 5
+					if scene_info["platform_1P"][0] < 100 and afterR+30 > pred and afterR+10 < pred:
+						return 1
+					elif scene_info["platform_1P"][0] > 100 and afterL+30 > pred and afterL+10 < pred:
+						return 2
+					#print("N")
+					else:
+						return 0    #NONE
 			elif scene_info["platform_1P"][0]+20 <= (pred-10):
+				#print("R")
 				return 1	#RIGHT
 			else:
+				#print("L")
 				return 2	#LEFT
 		else:
 			if scene_info["platform_2P"][0]+20  > (pred-15)and scene_info["platform_2P"][0]+20 < (pred+10):
@@ -99,6 +115,62 @@ def ml_loop(side: str):
 				return 1	#RIGHT
 			else: 
 				return 2	#LEFT
+
+	def slicing_predict(ball_x, speed_x, speed_y):
+		# Positive Slicing
+		x = ball_x
+		y = 415
+		blocker_x = scene_info["blocker"][0]
+		blocker_direction = blocker_dir
+		speed_x += 3
+
+		while y > 260:
+			blocker_x = blocker_x + (blocker_direction * 5)
+			if blocker_x>270:
+				blocker_x = 270
+				blocker_direction *= -1
+			elif blocker_x < 0:
+				blocker_x = 0
+				blocker_direction *= -1
+
+			x += speed_x
+			y -= speed_y
+			if x > 195:
+				x = 195
+				speed_x *= -1
+			elif x < 0:
+				x = 0
+				speed_x *= -1
+		if blocker_x > x+5 or blocker_x+30 < x:
+			return speed_x / abs(speed_x)
+
+		# Opposite Slicing
+		x = ball_x
+		y = 415
+		blocker_x = scene_info["blocker"][0]
+		blocker_direction = blocker_dir
+		speed_x = (speed_x-3) * -1
+
+		while y > 260:
+			blocker_x = blocker_x + (blocker_direction * 5)
+			if blocker_x>270:
+				blocker_x = 270
+				blocker_direction *= -1
+			elif blocker_x < 0:
+				blocker_x = 0
+				blocker_direction *= -1
+
+			x += speed_x
+			y -= speed_y
+			if x > 195:
+				x = 195
+				speed_x *= -1
+			elif x < 0:
+				x = 0
+				speed_x *= -1
+		if blocker_x > x+5 or blocker_x+30 < x:
+			return -(speed_x / abs(speed_x))
+		return 0
 
 	# 2. Inform the game process that ml process is ready
 	comm.ml_ready()
@@ -126,7 +198,11 @@ def ml_loop(side: str):
 		if not ball_served:
 			comm.send_to_game({"frame": scene_info["frame"], "command": "SERVE_TO_RIGHT"})
 			ball_served = True
+			pre_blocker = scene_info["blocker"][0]
 		else:
+			blocker_dir = scene_info["blocker"][0] - pre_blocker
+			pre_blocker = scene_info["blocker"][0]
+
 			if side == "1P":
 				command = ml_loop_for_1P()
 			else:
