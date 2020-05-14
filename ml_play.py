@@ -82,12 +82,6 @@ def ml_loop(side: str):
 					slicing_dir = slicing_predict(ball_x = scene_info["ball"][0], speed_x = scene_info["ball_speed"][0], speed_y = scene_info["ball_speed"][1])
 					print("******Slicing", slicing_dir)
 					return slicing_dir
-					'''if scene_info["ball_speed"][0] < 0:
-						print("RIGHT, speed_x = ", scene_info["ball_speed"][0], "speed_y = ", scene_info["ball_speed"][1], "ball_y = ", scene_info["ball"][1])
-						return 1
-					elif scene_info["ball_speed"][0] > 0:
-						print("LEFT, speed_x = ", scene_info["ball_speed"][0], "speed_y = ", scene_info["ball_speed"][1], "ball_y = ", scene_info["ball"][1])
-						return 2'''
 				else:
 					'''afterR = scene_info["platform_1P"][0] + 5
 					afterL = scene_info["platform_1P"][0] - 5
@@ -126,7 +120,7 @@ def ml_loop(side: str):
 		blocker_direction = blocker_dir
 		speed = speed_x + 3
 
-		while y > 260:
+		while y > 240:
 			blocker_x = blocker_x + (blocker_direction * 5)
 			if blocker_x>270:
 				blocker_x = 270
@@ -157,7 +151,7 @@ def ml_loop(side: str):
 		blocker_direction = blocker_dir
 		speed = -speed_x
 
-		while y > 260:
+		while y > 240:
 			blocker_x = blocker_x + (blocker_direction * 5)
 			if blocker_x>270:
 				blocker_x = 270
