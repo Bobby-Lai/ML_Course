@@ -120,7 +120,7 @@ def ml_loop(side: str):
 		blocker_direction = blocker_dir
 		speed = speed_x + 3
 
-		while y > 240:
+		while y > 260:
 			blocker_x = blocker_x + (blocker_direction * 5)
 			if blocker_x>170:
 				blocker_x = 170
@@ -151,7 +151,7 @@ def ml_loop(side: str):
 		blocker_direction = blocker_dir
 		speed = -speed_x
 
-		while y > 240:
+		while y > 260:
 			blocker_x = blocker_x + (blocker_direction * 5)
 			if blocker_x>170:
 				blocker_x = 170
@@ -175,7 +175,7 @@ def ml_loop(side: str):
 				return 1
 			#print("Slice Oppositive, ", -(speed_x / abs(speed_x)), " / ", speed_x)
 		return 0
-		print("No Slice")
+		#print("No Slice")
 
 	# 2. Inform the game process that ml process is ready
 	comm.ml_ready()
