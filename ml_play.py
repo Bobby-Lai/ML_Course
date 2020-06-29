@@ -33,6 +33,7 @@ class MLPlay:
 		global target_path
 		global last_command
 		has_car = []
+		has_coin = []
 		command = []
 		surrounded = 0
 
@@ -56,6 +57,28 @@ class MLPlay:
 			if scene_info.__contains__("coins"):
 				self.coins_pos = scene_info["coins"]
 			
+			#		  玩家前方五道金幣
+			#        |    |    |    |
+			#   |  0 |  1 |  2 |  3 |  4 |
+			#        |    |    |    |
+			#        |    |  c |    |
+			for i in range(5):
+				has_coin.append(0)
+
+			if len(self.coins_pos) != 0:
+				# print(self.coins_pos)
+				for coin in self.coins_pos:
+					if coin[1] < self.car_pos[1]:
+						if coin[0] + 10 == self.lanes[self.car_lane] - 140:
+							has_coin[0] = 1
+						elif coin[0] + 10  == self.lanes[self.car_lane] - 70:
+							has_coin[1] = 1
+						elif coin[0] + 10  == self.lanes[self.car_lane]:
+							has_coin[2] = 1
+						elif coin[0] + 10  == self.lanes[self.car_lane] + 70:
+							has_coin[3] = 1
+						elif coin[0] + 10  == self.lanes[self.car_lane] + 140:
+							has_coin[4] = 1
 
 			#		玩家車輛相對位置九宮格
 			#        |    |    |    |
@@ -144,12 +167,6 @@ class MLPlay:
 					has_car[has_car_index][2] = car["pos"][0]
 					has_car[has_car_index][3] = car["pos"][1]
 
-			if self.player_no == 0:
-				print(has_car[0][0], has_car[1][0], has_car[2][0])
-				print(has_car[3][0], has_car[4][0], has_car[5][0])
-				print(has_car[6][0], has_car[7][0], has_car[8][0])
-				print("------------------------------------")
-
 			# 正前方有車，判斷要往左或往右移
 			if has_car[4][0] or has_car[1][0]:
 				# 1. 先檢查車左前及右前方
@@ -174,9 +191,27 @@ class MLPlay:
 				else:
 					################################################# COIN (前方有車，左前及右前沒車)
 					if last_path > 310:
-						target_path = self.lanes[self.car_lane - 1]
+						if has_coin[1]:
+							target_path = self.lanes[self.car_lane - 1]
+						elif has_coin[3]:
+							target_path = self.lanes[self.car_lane + 1]
+						elif has_coin[0]:
+							target_path = self.lanes[self.car_lane - 1]
+						elif has_coin[4]:
+							target_path = self.lanes[self.car_lane + 1]
+						else:
+							target_path = self.lanes[self.car_lane - 1]
 					else:
-						target_path = self.lanes[self.car_lane + 1]
+						if has_coin[3]:
+							target_path = self.lanes[self.car_lane + 1]
+						elif has_coin[1]:
+							target_path = self.lanes[self.car_lane - 1]
+						elif has_coin[4]:
+							target_path = self.lanes[self.car_lane + 1]
+						elif has_coin[0]:
+							target_path = self.lanes[self.car_lane - 1]
+						else:
+							target_path = self.lanes[self.car_lane + 1]
 				
 				# 2. 檢查車子左右，若有車則覆蓋 target_path
 				if has_car[3][0] and has_car[5][0]:
@@ -186,6 +221,27 @@ class MLPlay:
 					target_path = self.lanes[self.car_lane + 1]
 				elif has_car[5][0]:
 					target_path = self.lanes[self.car_lane - 1]
+			else:	# 正前方沒車
+				if has_coin[2]:
+					pass
+				elif last_path > 310:
+					if has_coin[1] and not has_car[3][0] and not has_car[0][0]:
+						target_path = self.lanes[self.car_lane - 1]
+					elif has_coin[3] and not has_car[5][0] and not has_car[2][0]:
+						target_path = self.lanes[self.car_lane + 1]
+					elif has_coin[0] and not has_car[3][0] and not has_car[0][0]:
+						target_path = self.lanes[self.car_lane - 1]
+					elif has_coin[4] and not has_car[5][0] and not has_car[2][0]:
+						target_path = self.lanes[self.car_lane + 1]
+				else:
+					if has_coin[3] and not has_car[5][0] and not has_car[2][0]:
+						target_path = self.lanes[self.car_lane + 1]
+					elif has_coin[1] and not has_car[3][0] and not has_car[0][0]:
+						target_path = self.lanes[self.car_lane - 1]
+					elif has_coin[4] and not has_car[5][0] and not has_car[2][0]:
+						target_path = self.lanes[self.car_lane + 1]
+					elif has_coin[0] and not has_car[3][0] and not has_car[0][0]:
+						target_path = self.lanes[self.car_lane - 1]
 
 			# if command == []:
 			# 依據 target_path 加入向左移／向右移指令
@@ -322,3 +378,4 @@ class MLPlay:
 		target_path = 0
 		print("####################### RESET ########################")
 		pass
+
