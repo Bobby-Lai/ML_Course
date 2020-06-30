@@ -106,29 +106,29 @@ class MLPlay:
 			# 填入左邊界
 			if self.car_lane == 0:
 				has_car[0][0] = 1
-				has_car[0][1] = 0
+				has_car[0][1] = -1
 				has_car[0][2] = -35
-				has_car[0][3] = self.car_pos[1] + 100
+				has_car[0][3] = self.car_pos[1] + 101
 				has_car[3][0] = 1
-				has_car[3][1] = 0
+				has_car[3][1] = -1
 				has_car[3][2] = -35
 				has_car[3][3] = self.car_pos[1]
 				has_car[6][0] = 1
-				has_car[6][1] = 0
+				has_car[6][1] = -1
 				has_car[6][2] = -35
 				has_car[6][3] = self.car_pos[1] - 100
 			# 填入右邊界
 			if self.car_lane == 8:
 				has_car[2][0] = 1
-				has_car[2][1] = 0
+				has_car[2][1] = -1
 				has_car[2][2] = 665
-				has_car[2][3] = self.car_pos[1] + 100
+				has_car[2][3] = self.car_pos[1] + 101
 				has_car[5][0] = 1
-				has_car[5][1] = 0
+				has_car[5][1] = -1
 				has_car[5][2] = 665
 				has_car[5][3] = self.car_pos[1]
 				has_car[8][0] = 1
-				has_car[8][1] = 0
+				has_car[8][1] = -1
 				has_car[8][2] = 665
 				has_car[8][3] = self.car_pos[1] - 100
 			# 生成當前狀態九宮格 (若格內有車，flag = 1, 並記錄速度及位置)
@@ -136,7 +136,7 @@ class MLPlay:
 				xx = car["pos"][0] - self.lanes[self.car_lane]
 				yy = car["pos"][1] - self.car_pos[1]
 				has_car_index = -1
-				parallel_y = 85 - (self.car_vel - car["velocity"])*8    # player can run more/less than computer
+				parallel_y = 85 - (self.car_vel - car["velocity"])*6    # player can run more/less than computer
 
 				if car["id"] == self.player_no:
 					continue
@@ -178,7 +178,11 @@ class MLPlay:
 					right_t = (self.car_pos[0] - (self.lanes[self.car_lane] + 70)) // 3
 					left_d -= (self.car_vel - has_car[0][1]) * left_t
 					right_d -= (self.car_vel - has_car[2][1]) * right_t
-					if left_d > right_d:
+					if has_car[0][1] == -1:
+						target_path = self.lanes[self.car_lane + 1]
+					elif has_car[2][1] == -1:
+						target_path = self.lanes[self.car_lane - 1]
+					elif left_d > right_d:
 						target_path = self.lanes[self.car_lane - 1]
 					else:
 						target_path = self.lanes[self.car_lane + 1]
@@ -226,22 +230,30 @@ class MLPlay:
 					pass
 				elif last_path > 310:
 					if has_coin[1] and not has_car[3][0] and not has_car[0][0]:
-						target_path = self.lanes[self.car_lane - 1]
+						if not ["MOVE_RIGHT"] in last_command:
+							target_path = self.lanes[self.car_lane - 1]
 					elif has_coin[3] and not has_car[5][0] and not has_car[2][0]:
-						target_path = self.lanes[self.car_lane + 1]
+						if not ["MOVE_LEFT"] in last_command:
+							target_path = self.lanes[self.car_lane + 1]
 					elif has_coin[0] and not has_car[3][0] and not has_car[0][0]:
-						target_path = self.lanes[self.car_lane - 1]
+						if not ["MOVE_RIGHT"] in last_command:
+							target_path = self.lanes[self.car_lane - 1]
 					elif has_coin[4] and not has_car[5][0] and not has_car[2][0]:
-						target_path = self.lanes[self.car_lane + 1]
+						if not ["MOVE_LEFT"] in last_command:
+							target_path = self.lanes[self.car_lane + 1]
 				else:
 					if has_coin[3] and not has_car[5][0] and not has_car[2][0]:
-						target_path = self.lanes[self.car_lane + 1]
+						if not ["MOVE_LEFT"] in last_command:
+							target_path = self.lanes[self.car_lane + 1]
 					elif has_coin[1] and not has_car[3][0] and not has_car[0][0]:
-						target_path = self.lanes[self.car_lane - 1]
+						if not ["MOVE_RIGHT"] in last_command:
+							target_path = self.lanes[self.car_lane - 1]
 					elif has_coin[4] and not has_car[5][0] and not has_car[2][0]:
-						target_path = self.lanes[self.car_lane + 1]
+						if not ["MOVE_LEFT"] in last_command:
+							target_path = self.lanes[self.car_lane + 1]
 					elif has_coin[0] and not has_car[3][0] and not has_car[0][0]:
-						target_path = self.lanes[self.car_lane - 1]
+						if not ["MOVE_RIGHT"] in last_command:
+							target_path = self.lanes[self.car_lane - 1]
 
 			# if command == []:
 			# 依據 target_path 加入向左移／向右移指令
@@ -254,44 +266,32 @@ class MLPlay:
 			V = self.car_vel
 			if surrounded: #and V > has_car[1][0]:
 				if has_car[4][0]:
-					if has_car[3][1] > has_car[5][1] and has_car[3][1] != 0:
+					if has_car[3][1] > has_car[5][1] and has_car[3][1] != -1 and has_car[3][3] < self.car_pos[1] - 70:
 						command = ["BRAKE", "MOVE_LEFT"]
-					elif has_car[5][1] > has_car[3][1] and has_car[5][1] != 0:
+						target_path = self.lanes[self.car_lane - 1]
+					elif has_car[5][1] > has_car[3][1] and has_car[5][1] != -1 and has_car[5][3] < self.car_pos[1] - 70:
 						command = ["BRAKE", "MOVE_RIGHT"]
-					elif has_car[3][1] == 0:
+						target_path = self.lanes[self.car_lane + 1]
+					elif has_car[3][1] == -1:
 						command = ["BRAKE", "MOVE_RIGHT"]
-					elif has_car[5][1] == 0:
+						target_path = self.lanes[self.car_lane + 1]
+					elif has_car[5][1] == -1:
 						command = ["BRAKE", "MOVE_LEFT"]
+						target_path = self.lanes[self.car_lane - 1]
 					else:
 						command = ["BRAKE"]
 				elif has_car[1][0]:
-					if has_car[3][3] - self.car_pos[1] > 40 - 5 * self.car_vel and has_car[3][1] != 0:
+					if has_car[3][3] - self.car_pos[1] > 40 - 5 * self.car_vel and has_car[3][1] != -1:
 						command = ["SPEED", "MOVE_LEFT"]
-					elif has_car[5][3] - self.car_pos[1] > 40 - 5 * self.car_vel and has_car[5][1] != 0:
+						target_path = self.lanes[self.car_lane - 1]
+					elif has_car[5][3] - self.car_pos[1] > 40 - 5 * self.car_vel and has_car[5][1] != -1:
 						command = ["SPEED", "MOVE_RIGHT"]
+						target_path = self.lanes[self.car_lane + 1]
 					else:
 						command = ["SPEED"]
 				else:
 					command = ["SPEED"]
-					# elif not has_car[0][0] or not has_car[2][0]:
-					# 	command = ["SPEED"]
-					# elif has_car[3][1] > has_car[5][1] and has_car[3][1] != 0:
-					# 	command = ["BRAKE", "MOVE_LEFT"]
-					# elif has_car[5][1] > has_car[3][1] and has_car[5][1] != 0:
-					# 	command = ["BRAKE", "MOVE_RIGHT"]
-					# elif has_car[3][1] == 0:
-					# 	command = ["BRAKE", "MOVE_RIGHT"]
-					# elif has_car[5][1] == 0:
-					# 	command = ["BRAKE", "MOVE_LEFT"]
-					# else:
-					# 	command = ["BRAKE"]
-			elif target_path - self.car_pos[0] > 2:  # MOVE RIGHT
-				if has_car[1][0]:
-					auto_brake_time = (V - has_car[1][1])/0.3
-					if V*auto_brake_time + (0.5*-0.3*math.pow(auto_brake_time,2)) - has_car[1][1]*auto_brake_time >= abs(self.car_pos[1] - has_car[1][3]) - 80:
-						command.append("BRAKE")
-					elif V < has_car[1][1]:
-						command.append("SPEED")
+			elif "MOVE_RIGHT" in command:  # MOVE RIGHT
 				if has_car[4][0]:
 					auto_brake_time = (V - has_car[4][1])/0.3
 					if V*auto_brake_time + (0.5*-0.3*math.pow(auto_brake_time,2)) - has_car[4][1]*auto_brake_time >= abs(self.car_pos[1] - has_car[4][3]) - 80:
@@ -300,19 +300,13 @@ class MLPlay:
 						command.append("SPEED")
 				if has_car[2][0]:   
 					auto_brake_time = (V - has_car[2][1])/0.3
-					if V*auto_brake_time + (0.5*-0.3*math.pow(auto_brake_time,2)) - has_car[2][1]*auto_brake_time >= abs(self.car_pos[1] - has_car[2][3]) - 80:
+					if V*auto_brake_time + (0.5*-0.3*math.pow(auto_brake_time,2)) - has_car[2][1]*auto_brake_time >= abs(self.car_pos[1] - has_car[2][3]) - 80 and has_car[2][1] != -1:
 						command.append("BRAKE")
-					elif V < has_car[2][1]:
+					elif V < has_car[2][1] or has_car[2][1] == -1:
 						command.append("SPEED")
 				if not has_car[1][0] and not has_car[2][0] and not has_car[4][0]:
 					command.append("SPEED")
-			elif target_path - self.car_pos[0] < -2:   #MOVE LEFT
-				if has_car[1][0]:
-					auto_brake_time = (V - has_car[1][1])/0.3
-					if V*auto_brake_time + (0.5*-0.3*math.pow(auto_brake_time,2)) - has_car[1][1]*auto_brake_time >= abs(self.car_pos[1] - has_car[1][3]) - 80:
-						command.append("BRAKE")
-					elif V < has_car[1][1]:
-						command.append("SPEED")
+			elif "MOVE_LEFT" in command:   #MOVE LEFT
 				if has_car[4][0]:
 					auto_brake_time = (V - has_car[4][1])/0.3
 					if V*auto_brake_time + (0.5*-0.3*math.pow(auto_brake_time,2)) - has_car[4][1]*auto_brake_time >= abs(self.car_pos[1] - has_car[4][3]) - 80:
@@ -321,28 +315,14 @@ class MLPlay:
 						command.append("SPEED")
 				if has_car[0][0]:
 					auto_brake_time = (V - has_car[0][1])/0.3
-					if V*auto_brake_time + (0.5*-0.3*math.pow(auto_brake_time,2)) - has_car[0][1]*auto_brake_time >= abs(self.car_pos[1] - has_car[0][3]) - 80:
+					if V*auto_brake_time + (0.5*-0.3*math.pow(auto_brake_time,2)) - has_car[0][1]*auto_brake_time >= abs(self.car_pos[1] - has_car[0][3]) - 80 and has_car[0][1] != -1:
 						command.append("BRAKE")
-					elif V < has_car[0][1]:
+					elif V < has_car[0][1] or has_car[0][1] == -1:
 						command.append("SPEED")
 				if not has_car[1][0] and not has_car[0][0] and not has_car[4][0]:
 					command.append("SPEED")
 			else:
-				if has_car[1][0]:
-					auto_brake_time = (V - has_car[1][1])/0.3
-					if V*auto_brake_time + (0.5*-0.3*math.pow(auto_brake_time,2)) - has_car[1][1]*auto_brake_time >= abs(self.car_pos[1] - has_car[1][3]) - 80:
-						command.append("BRAKE")
-					elif V < has_car[1][1]:
-						command.append("SPEED")
-				elif has_car[4][0]:
-					auto_brake_time = (V - has_car[4][1])/0.3
-					if V*auto_brake_time + (0.5*-0.3*math.pow(auto_brake_time,2)) - has_car[4][1]*auto_brake_time >= abs(self.car_pos[1] - has_car[4][3]) - 80:
-						command.append("BRAKE")
-					elif V < has_car[4][1]:
-						command.append("SPEED")
-				else:
-					command.append("SPEED")
-
+				command.append("SPEED")
 			if len(command) != 0 and command[0] == "BRAKE":
 				for i in range(len(command)):
 					if command[i] == "SPEED":
@@ -358,7 +338,7 @@ class MLPlay:
 
 		if scene_info["status"] != "ALIVE":
 			return "RESET"
-
+		
 		return command
 
 
@@ -376,6 +356,4 @@ class MLPlay:
 		last_command = ["NONE", "NONE", "NONE"]
 		last_path = 0
 		target_path = 0
-		print("####################### RESET ########################")
 		pass
-
